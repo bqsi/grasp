@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<!-- shrug -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+<h1>Visualiser Test</h1>
+
+<audio id="audiosource" src="https://bqsi.keybase.pub/res/songs/convos.mp3" controls autoplay loop></audio>
+
+
+<input id="filechange"></input>
+<button onclick="changeSound()">song</button>
+<p>if you want to change the song you're gonna need to know my dir of songs so <a href="https://keybase.pub/bqsi/res/songs/">here you go</a> - put in the song file name (e.g "1.mp3") and nothing else then click the button</p>
+
+<details>
+<summary>⚠️</summary>
+you will be hit with an airhorn if you don't put in a number 5 times, please be careful and save your ears
+</details>
+
+<input id="speedchange"></input>
+<button onclick="changeSpeed()">speed</button>
+
+<hr>
+
+<canvas id="audiovis" height="500" width="1500" style="padding: 0; margin: auto; display: block; position: absolute; top: 0; bottom: 0; left: 0; right: 0;"></canvas>
+	
+</body>
+
+<script>
+
+/*
+
+you are reading my code
+that's interesting
+here's how the visualiser works since i did not comment the code:
+
+- web audio api reads the current audio file and generates a table of 255 numbers containing frequency data, one number for each frequency
+- for each number i draw a line from the bottom of the canvas to that number in height
+- that same operation repeats every frame
+
+CAUTION: you can be blasted with an airhorn if you don't use a number enough
+
+*/
+
+let times = 0;
+let step = 1.2;
+let canvas = document.getElementById("audiovis");
+let ctx = canvas.getContext("2d");
+let audio = document.getElementById("audiosource");
+let audioCtx = new AudioContext();
+let analyser = audioCtx.createAnalyser();
+let angle = Math.random() * 360;
+let d = new Date();
+let done = false
+
+let madtext = [
+	"WHY ARE YOU DOING THIS, USE A NUMBER",
+	"STOP IT, USE A NUMBER.",
+	"USE A NUMBER COME ON",
+	"what are you doing?? just use a number",
+	"i don't have time for this",
+	"can you not read?",
+	"bro",
+	"aight, i'm not changing the speed for you though",
+	"USE. A. NUMBER. PLEASE. IT'S. NOT. DIFFICULT.",
+	"use uen unber",
+	"nunmbr"
+]
+
+function changeSound(){
+	let n = Math.floor(Math.random() * 6);
+	console.log(n);
+	if (n == 2 && done == false) {
+		alert("OATLEAF WAS HERE");
+		audio.src = "https://bqsi.keybase.pub/res/songs/oatleaf.mp3";
+		done = true;
+	
+	} else {
+		audio.src = "https://bqsi.keybase.pub/res/songs/" + document.getElementById("filechange").value;
+	}
+}
+
+function changeSpeed(){
+	let n = parseInt(document.getElementById("speedchange").value);
+	
+	if (isNaN(n)) {
+		times += 1;
+		
+		if (times == 5) {
+			audio.src = "https://bqsi.keybase.pub/res/songs/umm.mp3";
+			
+			alert("you asked for it lol");
+			
+			times = 0;
+		} else {
+			alert(madtext[Math.floor(Math.random() * madtext.length)]);
+		}
+		
+		
+		return false;
+	}
+	
+	step = n;
+}
+
+analyser.fftSize = 2048;
+let source = audioCtx.createMediaElementSource(audio);
+
+//connect music back to def output
+source.connect(analyser);
+source.connect(audioCtx.destination);
+
+let data = new Uint8Array(analyser.frequencyBinCount);
+
+function draw(data) {
+	data = [...data];
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	let space = canvas.width / data.length;
+	angle += step;
+	
+	
+	data.forEach((value,i)=>{
+		ctx.beginPath();
+		ctx.lineCap = "round";
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = "hsl(" + angle % 360 + ", 100%, 50%)";
+		ctx.moveTo(space*i,canvas.height);
+		ctx.lineTo(space*i,canvas.height-value-1);
+		ctx.stroke()
+	})
+}
+
+function loopFunc(){
+	requestAnimationFrame(loopFunc)
+	
+	analyser.getByteFrequencyData(data)
+	
+	draw(data)
+}
+
+audio.onplay = ()=>{
+	audioCtx.resume();
+}
+
+requestAnimationFrame(loopFunc)
+
+</script>
+
+</html>
