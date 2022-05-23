@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta property="og:title" content="Color BG Generator" />
+    <meta property="og:type" content="website" />
+    <meta name ="viewport" content="width=device-width, initial-scale = 1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Color Background Generator</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(rgba(0, 0, 255, 0.4), rgba(0, 128, 128, 0.4)) rgba(255,255,255,0.9) center fixed;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @font-face {
+            font-family: 'Roses are FF0000';
+            src: url('./RosesAreFF0000.ttf');
+        }
+
+        #font {
+            font-family: 'Roses are FF0000';
+        }
+
+        p {
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: bold;
+            font-size: medium;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="font-family: 'Ubuntu', sans-serif; font-weight: bold; font-size: large; color:white; stroke: black; align-content: center; margin: 50px 0 auto;">Color Image Generator</h1>
+
+    <p>Create a colored image to use as a background.</p>
+    <p>Fill out the form below to generate the image.</p>
+    <p>Font: <a href="https://cargocollective.com/ajpaglia/De-Commissioned-Fonts" target="_blank"><span id="font">Roses are FF0000</span></a></p>
+
+
+    <form id="genform">
+        <label for="color"><p>Color: </p></label><input id="color" required="required" pattern="#[a-zA-Z0-9]{6}" title="Valid HEX Color Code" value="#E6E6FA">
+        <label for="text"><p>Text: </p></label><input id="text" required="required" value="Lavender">
+        <label for="fontcolor"><p>Font Color: </p></label><input id="fontcolor" required="required" pattern="#[a-zA-Z0-9]{6}" title="Valid HEX Color Code" value="#FFFFFF">
+        <input type="submit"> <a href="#!" id="imgsave"><p>Save Current Image</p></a>
+    </form>
+
+    <canvas style="margin: 50px auto;" id="canvas" width="1920" height="1080"></canvas>
+
+    <script>
+        document.getElementById('genform').addEventListener('submit', function(ev) {
+            var color = document.getElementById('color').value,
+                text = document.getElementById('text').value,
+                fontcolor = document.getElementById('fontcolor').value,
+                imgsave = document.getElementById('imgsave'),
+                canvas = document.getElementById('canvas'),
+                ctx = canvas.getContext('2d');
+
+            ev.preventDefault();
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = fontcolor;
+            ctx.lineWidth = 5;
+            ctx.strokeRect(834.5, 414.5, 251, 251);
+            ctx.fillStyle = fontcolor;
+            ctx.font = '16px Roses are FF0000';
+            ctx.fillText(text, 847, 443);
+            ctx.fillText('HEX ' + color.substring(1), 847, 453+24);
+            ctx.fillText('RGB ' + 
+                parseInt(color.substring(1,3), 16) + ' ' +
+                parseInt(color.substring(3,5), 16) + ' ' +
+                parseInt(color.substring(5,7), 16),
+            847, 453+48);
+            imgsave.setAttribute('download', color + '.png');
+            imgsave.setAttribute('href', canvas.toDataURL('image/png'));
+
+            return true;
+        })
+    </script>
+</body>
+</html>
